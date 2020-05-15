@@ -44,6 +44,7 @@ def customize(func):
     """
     Decorator to set plotting context and axes style during function call.
     """
+
     @wraps(func)
     def call_w_context(*args, **kwargs):
         set_context = kwargs.pop('set_context', True)
@@ -52,12 +53,13 @@ def customize(func):
                 return func(*args, **kwargs)
         else:
             return func(*args, **kwargs)
+
     return call_w_context
 
 
 def plotting_context(context='notebook', font_scale=1.5, rc=None):
     """
-    Create pyfolio default plotting style context.
+    Create Pyfolio default plotting style context.
 
     Under the hood, calls and returns seaborn.plotting_context() with
     some custom settings. Usually you would use in a with-context.
@@ -80,8 +82,8 @@ def plotting_context(context='notebook', font_scale=1.5, rc=None):
 
     Example
     -------
-    >>> with pyfolio.plotting.plotting_context(font_scale=2):
-    >>>    pyfolio.create_full_tear_sheet(..., set_context=False)
+    >>> with Pyfolio.plotting.plotting_context(font_scale=2):
+    >>>    Pyfolio.create_full_tear_sheet(..., set_context=False)
 
     See also
     --------
@@ -102,7 +104,7 @@ def plotting_context(context='notebook', font_scale=1.5, rc=None):
 
 def axes_style(style='darkgrid', rc=None):
     """
-    Create pyfolio default axes style context.
+    Create Pyfolio default axes style context.
 
     Under the hood, calls and returns seaborn.axes_style() with
     some custom settings. Usually you would use in a with-context.
@@ -120,8 +122,8 @@ def axes_style(style='darkgrid', rc=None):
 
     Example
     -------
-    >>> with pyfolio.plotting.axes_style(style='whitegrid'):
-    >>>    pyfolio.create_full_tear_sheet(..., set_context=False)
+    >>> with Pyfolio.plotting.axes_style(style='whitegrid'):
+    >>>    Pyfolio.create_full_tear_sheet(..., set_context=False)
 
     See also
     --------
@@ -436,7 +438,7 @@ def plot_drawdown_periods(returns, top=10, ax=None, **kwargs):
     lim = ax.get_ylim()
     colors = sns.cubehelix_palette(len(df_drawdowns))[::-1]
     for i, (peak, recovery) in df_drawdowns[
-            ['Peak date', 'Recovery date']].iterrows():
+        ['Peak date', 'Recovery date']].iterrows():
         if pd.isnull(recovery):
             recovery = returns.index[-1]
         ax.fill_between((peak, recovery),
@@ -655,7 +657,7 @@ def show_perf_stats(returns, factor_returns=None, positions=None,
         header_rows = OrderedDict(header_rows)
         header_rows.update(date_rows)
 
-    utils.print_table(
+    return utils.print_table(
         perf_stats,
         float_format='{0:.2f}'.format,
         header_rows=header_rows,
@@ -1669,7 +1671,7 @@ def show_worst_drawdown_periods(returns, top=5):
     """
 
     drawdown_df = timeseries.gen_drawdown_table(returns, top=top)
-    utils.print_table(
+    return utils.print_table(
         drawdown_df.sort_values('Net drawdown in %', ascending=False),
         name='Worst drawdown periods',
         float_format='{0:.2f}'.format,

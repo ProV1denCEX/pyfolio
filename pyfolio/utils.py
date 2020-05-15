@@ -117,7 +117,7 @@ def extract_rets_pos_txn_from_zipline(backtest):
     backtest data structure returned by zipline.TradingAlgorithm.run().
 
     The returned data structures are in a format compatible with the
-    rest of pyfolio and can be directly passed to
+    rest of Pyfolio and can be directly passed to
     e.g. tears.create_full_tear_sheet().
 
     Parameters
@@ -142,8 +142,8 @@ def extract_rets_pos_txn_from_zipline(backtest):
     ---------------------------------------------
     >>> backtest = my_algo.run()
     >>> returns, positions, transactions =
-    >>>     pyfolio.utils.extract_rets_pos_txn_from_zipline(backtest)
-    >>> pyfolio.tears.create_full_tear_sheet(returns,
+    >>>     Pyfolio.utils.extract_rets_pos_txn_from_zipline(backtest)
+    >>> Pyfolio.tears.create_full_tear_sheet(returns,
     >>>     positions, transactions)
     """
 
@@ -201,22 +201,24 @@ def print_table(table,
     if name is not None:
         table.columns.name = name
 
-    html = table.to_html(float_format=float_format, formatters=formatters)
+    return table
 
-    if header_rows is not None:
-        # Count the number of columns for the text to span
-        n_cols = html.split('<thead>')[1].split('</thead>')[0].count('<th>')
+    # html = table.to_html(float_format=float_format, formatters=formatters)
+    #
+    # if header_rows is not None:
+    #     # Count the number of columns for the text to span
+    #     n_cols = html.split('<thead>')[1].split('</thead>')[0].count('<th>')
+    #
+    #     # Generate the HTML for the extra rows
+    #     rows = ''
+    #     for name, value in header_rows.items():
+    #         rows += ('\n    <tr style="text-align: right;"><th>%s</th>' +
+    #                  '<td colspan=%d>%s</td></tr>') % (name, n_cols, value)
+    #
+    #     # Inject the new HTML
+    #     html = html.replace('<thead>', '<thead>' + rows)
 
-        # Generate the HTML for the extra rows
-        rows = ''
-        for name, value in header_rows.items():
-            rows += ('\n    <tr style="text-align: right;"><th>%s</th>' +
-                     '<td colspan=%d>%s</td></tr>') % (name, n_cols, value)
-
-        # Inject the new HTML
-        html = html.replace('<thead>', '<thead>' + rows)
-
-    display(HTML(html))
+    # display(HTML(html))
 
 
 def standardize_data(x):

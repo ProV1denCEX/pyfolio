@@ -18,10 +18,10 @@ import warnings
 from time import time
 
 import empyrical as ep
-from IPython.display import display, Markdown
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import pandas as pd
+from IPython.display import display, Markdown
 
 from . import _seaborn as sns
 from . import capacity
@@ -168,8 +168,8 @@ def create_full_tear_sheet(returns,
         - See create_perf_attrib_tear_sheet().
     """
 
-    if (unadjusted_returns is None) and (slippage is not None) and\
-       (transactions is not None):
+    if (unadjusted_returns is None) and (slippage is not None) and \
+            (transactions is not None):
         unadjusted_returns = returns.copy()
         returns = txn.adjust_returns_for_slippage(returns, positions,
                                                   transactions, slippage)
@@ -463,15 +463,15 @@ def create_returns_tear_sheet(returns, positions=None,
     if benchmark_rets is not None:
         returns = utils.clip_returns_to_benchmark(returns, benchmark_rets)
 
-    plotting.show_perf_stats(returns, benchmark_rets,
-                             positions=positions,
-                             transactions=transactions,
-                             turnover_denom=turnover_denom,
-                             bootstrap=bootstrap,
-                             live_start_date=live_start_date,
-                             header_rows=header_rows)
+    perf_stats = plotting.show_perf_stats(returns, benchmark_rets,
+                                          positions=positions,
+                                          transactions=transactions,
+                                          turnover_denom=turnover_denom,
+                                          bootstrap=bootstrap,
+                                          live_start_date=live_start_date,
+                                          header_rows=header_rows)
 
-    plotting.show_worst_drawdown_periods(returns)
+    worst_drawdown_periods = plotting.show_worst_drawdown_periods(returns)
 
     vertical_sections = 11
 
@@ -592,7 +592,7 @@ def create_returns_tear_sheet(returns, positions=None,
         plt.setp(ax.get_xticklabels(), visible=True)
 
     if return_fig:
-        return fig
+        return fig, perf_stats, worst_drawdown_periods
 
 
 @plotting.customize
@@ -716,8 +716,8 @@ def create_txn_tear_sheet(returns, positions, transactions,
     unadjusted_returns : pd.Series, optional
         Daily unadjusted returns of the strategy, noncumulative.
         Will plot additional swippage sweep analysis.
-         - See pyfolio.plotting.plot_swippage_sleep and
-           pyfolio.plotting.plot_slippage_sensitivity
+         - See Pyfolio.plotting.plot_swippage_sleep and
+           Pyfolio.plotting.plot_slippage_sensitivity
     estimate_intraday: boolean or str, optional
         Approximate returns for intraday strategies.
         See description in create_full_tear_sheet.
@@ -907,17 +907,19 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
                       'interesting times.', UserWarning)
         return
 
-    utils.print_table(pd.DataFrame(rets_interesting)
-                      .describe().transpose()
-                      .loc[:, ['mean', 'min', 'max']] * 100,
-                      name='Stress Events',
-                      float_format='{0:.2f}%'.format)
-
     if benchmark_rets is not None:
         returns = utils.clip_returns_to_benchmark(returns, benchmark_rets)
 
         bmark_interesting = timeseries.extract_interesting_date_ranges(
             benchmark_rets, periods)
+
+    stats_interesting = []
+    for k, v in rets_interesting.items():
+        perf_stats = plotting.show_perf_stats(v, bmark_interesting[k])
+        perf_stats.columns = [k]
+        stats_interesting.append(perf_stats)
+
+    stats_interesting = pd.concat(stats_interesting, axis=1)
 
     num_plots = len(rets_interesting)
     # 2 plots, 1 row; 3 plots, 2 rows; 4 plots, 2 rows; etc.
@@ -947,7 +949,7 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
         ax.set_xlabel('')
 
     if return_fig:
-        return fig
+        return fig, stats_interesting
 
 
 @plotting.customize
@@ -1143,7 +1145,6 @@ def create_perf_attrib_tear_sheet(returns,
     if factor_partitions is not None:
 
         for factor_type, partitions in factor_partitions.items():
-
             columns_to_select = perf_attrib_data.columns.intersection(
                 partitions
             )
@@ -1158,7 +1159,6 @@ def create_perf_attrib_tear_sheet(returns,
             current_section += 1
 
         for factor_type, partitions in factor_partitions.items():
-
             columns_to_select = portfolio_exposures.columns.intersection(
                 partitions
             )

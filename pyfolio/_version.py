@@ -37,8 +37,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "pyfolio-"
-    cfg.versionfile_source = "pyfolio/_version.py"
+    cfg.parentdir_prefix = "Pyfolio-"
+    cfg.versionfile_source = "Pyfolio/_version.py"
     cfg.verbose = False
     return cfg
 
